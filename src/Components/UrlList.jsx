@@ -14,7 +14,7 @@ export default class UrlList extends React.Component{
 
     onAdd = () => {
         let nUrl =this.state.addValue;
-        let nArr = [this.state.arr].concat({url:nUrl, isOnEdit:false});
+        let nArr = [...this.state.arr].concat({url:nUrl, isOnEdit:false});
         this.setState({arr: nArr});
         this.setState({addValue:''});
     }
@@ -26,7 +26,7 @@ export default class UrlList extends React.Component{
 
     onSort = () =>{
 
-        let sortedArr = this.state.arr.sort();
+        let sortedArr = this.state.arr.sort((a,b) => a.url > b.url ? 1 : -1);
 
         if (this.sortAccending) {
             this.sortAccending = false;
@@ -39,8 +39,9 @@ export default class UrlList extends React.Component{
         }
     }
 
-    onDelete = (url) => {   
-        this.setState({arr: this.state.arr.filter((u) => u !== url)});
+    onDelete = (url) => {  
+        let newArr = this.state.arr.filter((link) => link.url !== url); 
+        this.setState({arr: newArr});
     }
 
  
@@ -51,12 +52,18 @@ export default class UrlList extends React.Component{
     
     
     onSave = (e) => {
-        let nArr = this.state.arr.map((link) => {
-            if(link.url === e.target.name){
-                link.url = this.state.value ;
+
+        let nArr = [];
+        for(let i = 0; i < this.state.arr.length; i++){
+            if(this.state.arr[i].url === e.target.name){
+                nArr = [...this.state.arr];
+                let link = {...nArr[i]};
+                link.url = this.state.value;
                 link.isOnEdit = false;
+                nArr[i] = link;
             } 
-        });
+        }
+        
         this.setState({arr:nArr});
     }
       
@@ -82,8 +89,8 @@ export default class UrlList extends React.Component{
                 <hr />
                 <button onClick={() => this.onSort()}>Sort</button>
                 <br />
-                <input type="text" onChange={this.onAddChange} placeholder='Add URL link...' />
-                <button onClick={() => this.onAdd()}>Add</button>
+                <input value={this.state.addValue} type="text" onChange={this.onAddChange} placeholder='Add URL link...' />
+                <button onClick={this.onAdd}>Add</button>
                 <hr />
                 <ul>
                 {
